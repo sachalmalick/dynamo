@@ -190,9 +190,11 @@ class RLMixin:
         if isinstance(result, list):
             return {
                 "result": [
-                    dataclasses.asdict(item)
-                    if dataclasses.is_dataclass(item) and not isinstance(item, type)
-                    else item
+                    (
+                        dataclasses.asdict(item)
+                        if dataclasses.is_dataclass(item) and not isinstance(item, type)
+                        else item
+                    )
                     for item in result
                 ]
             }
@@ -692,6 +694,7 @@ class BaseWorkerHandler(LoraMixin, RLMixin, BaseGenerativeHandler[RequestT, Resp
         self.serving_mode = config.serving_mode
         self.use_sglang_tokenizer = config.dynamo_args.use_sglang_tokenizer
         self.enable_trace = getattr(config.server_args, "enable_trace", False)
+        self._benchmark_results: Optional[dict[str, Any]] = None
 
         if engine is not None:
             self.input_param_manager = InputParamManager(
@@ -971,6 +974,15 @@ class BaseWorkerHandler(LoraMixin, RLMixin, BaseGenerativeHandler[RequestT, Resp
         else:
             result = {"status": "error", "message": f"Unknown action: {action}"}
         yield result
+
+    async def get_perf_metrics(self, request: Optional[Dict[str, Any]] = None):
+        """Return startup self-benchmark results, or an error if unavailable."""
+
+        del request
+        if self._benchmark_results is None:
+            yield {"status": "error", "message": "no benchmark data"}
+        else:
+            yield self._benchmark_results
 
     def register_engine_routes(self, runtime: DistributedRuntime) -> None:
         """Register all engine routes for this handler.

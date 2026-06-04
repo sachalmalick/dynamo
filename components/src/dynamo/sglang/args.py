@@ -26,6 +26,7 @@ from dynamo.llm import fetch_model
 from dynamo.runtime.logging import configure_dynamo_logging
 from dynamo.sglang._compat import enable_disjoint_streaming_output
 from dynamo.sglang.backend_args import DynamoSGLangArgGroup, DynamoSGLangConfig
+from dynamo.sglang.benchmark import apply_benchmark_env
 
 configure_dynamo_logging()
 
@@ -70,9 +71,9 @@ def _preprocess_for_encode_config(
     return {
         "server_args": config.server_args,
         "dynamo_args": config.dynamo_args,
-        "serving_mode": config.serving_mode.value
-        if config.serving_mode is not None
-        else "None",
+        "serving_mode": (
+            config.serving_mode.value if config.serving_mode is not None else "None"
+        ),
     }
 
 
@@ -225,6 +226,7 @@ async def parse_args(args: list[str]) -> Config:
         unknown = config_merger.merge_config_with_args(unknown)
 
     parsed_args = sglang_only_parser.parse_args(unknown)
+    apply_benchmark_env(parsed_args, unknown)
 
     # Clean up temp file if created
     if temp_config_file and os.path.exists(temp_config_file):
