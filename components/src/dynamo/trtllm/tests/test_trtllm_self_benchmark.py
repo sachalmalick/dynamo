@@ -129,14 +129,15 @@ def test_cli_args_and_engine_args_use_trtllm_native_surface():
 
     engine_args = {}
     apply_self_benchmark_engine_args(engine_args, cfg)
-    assert engine_args == {
-        "self_benchmark_mode": "agg",
-        "self_benchmark_prefill_granularity": 2,
-        "self_benchmark_decode_length_granularity": 3,
-        "self_benchmark_decode_batch_granularity": 4,
-        "self_benchmark_warmup_iterations": 1,
-        "self_benchmark_output_path": "/tmp/out.json",
-        "self_benchmark_timeout": 9,
+    assert set(engine_args) == {"self_benchmark_config"}
+    assert engine_args["self_benchmark_config"].model_dump() == {
+        "mode": "agg",
+        "prefill_isl_granularity": 2,
+        "decode_context_granularity": 3,
+        "decode_batch_granularity": 4,
+        "warmup_iterations": 1,
+        "output_path": "/tmp/out.json",
+        "timeout_s": 9,
     }
 
 

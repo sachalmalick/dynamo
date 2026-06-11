@@ -151,18 +151,18 @@ def validate_self_benchmark_supported(config: Any, engine_args: dict[str, Any]) 
 def apply_self_benchmark_engine_args(
     engine_args: dict[str, Any], cfg: TrtllmSelfBenchmarkConfig
 ) -> None:
-    """Inject TRT-LLM native self-benchmark kwargs into LLM engine args."""
+    """Inject TRT-LLM native self-benchmark config into LLM engine args."""
 
-    engine_args.update(
-        {
-            "self_benchmark_mode": cfg.mode,
-            "self_benchmark_prefill_granularity": cfg.prefill_isl_granularity,
-            "self_benchmark_decode_length_granularity": cfg.decode_context_granularity,
-            "self_benchmark_decode_batch_granularity": cfg.decode_batch_granularity,
-            "self_benchmark_warmup_iterations": cfg.warmup_iterations,
-            "self_benchmark_output_path": cfg.output_path,
-            "self_benchmark_timeout": cfg.timeout_s,
-        }
+    from tensorrt_llm.llmapi.llm_args import SelfBenchmarkConfig
+
+    engine_args["self_benchmark_config"] = SelfBenchmarkConfig(
+        mode=cfg.mode,
+        prefill_isl_granularity=cfg.prefill_isl_granularity,
+        decode_context_granularity=cfg.decode_context_granularity,
+        decode_batch_granularity=cfg.decode_batch_granularity,
+        warmup_iterations=cfg.warmup_iterations,
+        output_path=cfg.output_path,
+        timeout_s=cfg.timeout_s,
     )
 
 
