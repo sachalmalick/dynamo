@@ -1,0 +1,15 @@
+# Auto Research — runtime dependencies
+#
+# The heuristic backend and the test suite need only pydantic. The LangChain
+# backend (AUTO_RESEARCH_MODE=llm) additionally needs langchain-core, langgraph,
+# and one provider integration.
+
+pydantic>=2.0
+
+# --- LangChain backend (mode=llm) ---
+langchain-core>=0.3
+langgraph>=0.2
+
+# Provider integrations — install the one you use:
+langchain-anthropic>=0.3   # AUTO_RESEARCH_PROVIDER=anthropic (default)
+# langchain-openai>=0.2    # AUTO_RESEARCH_PROVIDER=openai
